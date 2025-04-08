@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  survey: one
+  category: one
+  total_score: 1
+  max_score: 1
+  percentage: 1.5
+
+two:
+  user: two
+  survey: two
+  category: two
+  total_score: 1
+  max_score: 1
+  percentage: 1.5
