@@ -1,0 +1,13 @@
+<div class="container">
+  <h1>Survey System</h1>
+  
+  <div class="surveys">
+    <h2>Available Surveys</h2>
+    <% Survey.where(active: true).each do |survey| %>
+      <div class="survey-card">
+        <h3><%= link_to survey.title, survey_path(survey) %></h3>
+        <p><%= survey.description %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

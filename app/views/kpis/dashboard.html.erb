@@ -1,0 +1,92 @@
+<div class="container">
+  <h1>KPI Dashboard for <%= @survey.title %></h1>
+  
+  <div class="dashboard-section">
+    <h2>Average Score by Category</h2>
+    <div class="chart-container">
+      <canvas id="categoryChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-section">
+    <h2>Employee Engagement Index</h2>
+    <div class="chart-container">
+      <canvas id="engagementChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-section">
+    <h2>Performance Brackets</h2>
+    <div class="chart-container">
+      <canvas id="bracketsChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-section">
+    <h2>Category Performance Comparison</h2>
+    <div class="chart-container">
+      <canvas id="comparisonChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-section">
+    <h2>Dynamic Classification Thresholds</h2>
+    <table class="thresholds-table">
+      <thead>
+        <tr>
+          <th>Classification</th>
+          <th>Threshold</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Poor</td>
+          <td><%= @dynamic_thresholds[:poor] %>%</td>
+        </tr>
+        <tr>
+          <td>Average</td>
+          <td><%= @dynamic_thresholds[:average] %>%</td>
+        </tr>
+        <tr>
+          <td>Good</td>
+          <td><%= @dynamic_thresholds[:good] %>%</td>
+        </tr>
+        <tr>
+          <td>Very Proficient</td>
+          <td><%= @dynamic_thresholds[:very_proficient] %>%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Charts initialization would go here using the data from the controller
+  // Example for category chart:
+  const categoryData = <%= raw @avg_scores.to_json %>;
+  const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+  new Chart(categoryCtx, {
+    type: 'bar',
+    data: {
+      labels: categoryData.map(item => item.name),
+      datasets: [{
+        label: 'Average Score (%)',
+        data: categoryData.map(item => item.avg_score),
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100
+        }
+      }
+    }
+  });
+  
+  // Similar charts for other KPIs would be implemented here
+</script>

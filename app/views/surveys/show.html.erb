@@ -1,0 +1,91 @@
+<div class="container">
+  <h1><%= @survey.title %></h1>
+  <p><%= @survey.description %></p>
+  
+  <form id="survey-form" action="<%= survey_responses_path(@survey) %>" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+    
+    <div class="form-group">
+      <label for="user_id">Employee ID:</label>
+      <input type="text" name="user_id" id="user_id" required>
+    </div>
+    
+    <% @survey.categories.each do |category| %>
+      <div class="category-section">
+        <h2><%= category.name %></h2>
+        <p><%= category.description %></p>
+        
+        <% category.questions.order(:position).each do |question| %>
+          <div class="question">
+            <p><%= question.text %></p>
+            
+            <div class="answers">
+              <% question.answers.each do |answer| %>
+                <div class="answer-option">
+                  <input 
+                    type="radio" 
+                    name="question_answer_object[][answer_id]" 
+                    value="<%= answer.id %>" 
+                    id="answer_<%= answer.id %>"
+                    data-score="<%= answer.score %>"
+                    data-question-id="<%= question.id %>"
+                    data-category-id="<%= category.id %>"
+                  >
+                  <label for="answer_<%= answer.id %>"><%= answer.text %></label>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <button type="submit" class="submit-btn">Submit Response</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('survey-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+      user_id: document.getElementById('user_id').value,
+      question_answer_object: []
+    };
+    
+    // Get all selected answers
+    const selectedAnswers = document.querySelectorAll('input[name="question_answer_object[][answer_id]"]:checked');
+    
+    selectedAnswers.forEach(function(answer) {
+      formData.question_answer_object.push({
+        question_id: answer.dataset.questionId,
+        answer_id: answer.value,
+        score: answer.dataset.score,
+        category_id: answer.dataset.categoryId
+      });
+    });
+    
+    // Submit via AJAX
+    fetch('<%= survey_responses_path(@survey) %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('input[name="authenticity_token"]').value
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alert('Thank you for your response!');
+        window.location.href = '<%= surveys_path %>';
+      } else {
+        alert('Error: ' + data.errors.join(', '));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    });
+  });
+</script>
