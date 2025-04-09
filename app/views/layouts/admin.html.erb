@@ -67,7 +67,7 @@
             <%= content_for?(:breadcrumbs) ? yield(:breadcrumbs) : "Dashboard" %>
           </div>
           <div>
-            <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm text-gray-600 hover:text-red-500 transition" %>
+            <%= link_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "text-sm text-gray-600 hover:text-red-500 transition" %>
           </div>
         </header>
 
