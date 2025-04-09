@@ -1,92 +1,88 @@
-<div class="container">
-  <h1>KPI Dashboard for <%= @survey.title %></h1>
-  
-  <div class="dashboard-section">
-    <h2>Average Score by Category</h2>
-    <div class="chart-container">
-      <canvas id="categoryChart"></canvas>
+<div class="max-w-7xl mx-auto px-4 py-10">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">📊 KPI Dashboard for "<%= @survey.title %>"</h1>
+
+  <!-- Average Scores -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">1. Average Score per Category</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @avg_scores.each do |score| %>
+        <div class="bg-white shadow rounded-lg p-4 border">
+          <p class="text-gray-600 font-medium"><%= score.name %></p>
+          <p class="text-2xl font-bold text-indigo-600"><%= score.avg_score.round(2) %>%</p>
+        </div>
+      <% end %>
     </div>
   </div>
-  
-  <div class="dashboard-section">
-    <h2>Employee Engagement Index</h2>
-    <div class="chart-container">
-      <canvas id="engagementChart"></canvas>
-    </div>
-  </div>
-  
-  <div class="dashboard-section">
-    <h2>Performance Brackets</h2>
-    <div class="chart-container">
-      <canvas id="bracketsChart"></canvas>
-    </div>
-  </div>
-  
-  <div class="dashboard-section">
-    <h2>Category Performance Comparison</h2>
-    <div class="chart-container">
-      <canvas id="comparisonChart"></canvas>
-    </div>
-  </div>
-  
-  <div class="dashboard-section">
-    <h2>Dynamic Classification Thresholds</h2>
-    <table class="thresholds-table">
-      <thead>
+
+  <!-- Engagement Index -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">2. Employee Engagement Index</h2>
+    <table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
+      <thead class="bg-gray-100 text-gray-600 uppercase text-sm">
         <tr>
-          <th>Classification</th>
-          <th>Threshold</th>
+          <th class="px-6 py-3 text-left">User ID</th>
+          <th class="px-6 py-3 text-left">Engagement Score (%)</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>Poor</td>
-          <td><%= @dynamic_thresholds[:poor] %>%</td>
-        </tr>
-        <tr>
-          <td>Average</td>
-          <td><%= @dynamic_thresholds[:average] %>%</td>
-        </tr>
-        <tr>
-          <td>Good</td>
-          <td><%= @dynamic_thresholds[:good] %>%</td>
-        </tr>
-        <tr>
-          <td>Very Proficient</td>
-          <td><%= @dynamic_thresholds[:very_proficient] %>%</td>
-        </tr>
+      <tbody class="divide-y divide-gray-200">
+        <% @engagement_index.each do |row| %>
+          <tr>
+            <td class="px-6 py-4"><%= row.user_id %></td>
+            <td class="px-6 py-4"><%= row.engagement_score.round(2) %>%</td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Charts initialization would go here using the data from the controller
-  // Example for category chart:
-  const categoryData = <%= raw @avg_scores.to_json %>;
-  const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-  new Chart(categoryCtx, {
-    type: 'bar',
-    data: {
-      labels: categoryData.map(item => item.name),
-      datasets: [{
-        label: 'Average Score (%)',
-        data: categoryData.map(item => item.avg_score),
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100
-        }
-      }
-    }
-  });
-  
-  // Similar charts for other KPIs would be implemented here
-</script>
+  <!-- Performance Brackets -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">3. Performance Brackets (%)</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% @performance_brackets.each do |label, value| %>
+        <div class="bg-white p-4 shadow rounded-lg text-center">
+          <p class="text-sm text-gray-500 uppercase"><%= label %></p>
+          <p class="text-2xl font-bold text-green-600"><%= value %>%</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Category Comparison -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">4. Category Score Comparison</h2>
+    <table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
+      <thead class="bg-gray-100 text-gray-600 uppercase text-sm">
+        <tr>
+          <th class="px-6 py-3 text-left">Category</th>
+          <th class="px-6 py-3 text-left">Min</th>
+          <th class="px-6 py-3 text-left">Max</th>
+          <th class="px-6 py-3 text-left">Avg</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @category_comparison.each do |category, stats| %>
+          <tr>
+            <td class="px-6 py-4 font-medium"><%= category %></td>
+            <td class="px-6 py-4"><%= stats[:min_score] %>%</td>
+            <td class="px-6 py-4"><%= stats[:max_score] %>%</td>
+            <td class="px-6 py-4"><%= stats[:avg_score] %>%</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Dynamic Thresholds -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">5. Dynamic Classification Thresholds</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% @dynamic_thresholds.each do |label, value| %>
+        <div class="bg-white p-4 shadow rounded-lg text-center">
+          <p class="text-sm text-gray-500 uppercase"><%= label.to_s.titleize %></p>
+          <p class="text-2xl font-bold text-blue-600"><%= value %>%</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

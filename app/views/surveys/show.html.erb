@@ -1,61 +1,68 @@
-<div class="container">
-  <h1><%= @survey.title %></h1>
-  <p><%= @survey.description %></p>
-  
-  <form id="survey-form" action="<%= survey_responses_path(@survey) %>" method="post">
-    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-    
-    <div class="form-group">
-      <label for="user_id">Employee ID:</label>
-      <input type="text" name="user_id" id="user_id" required>
+<form id="survey-form" action="<%= survey_responses_path(@survey) %>" method="post" class="space-y-6 bg-white p-6 rounded-2xl shadow">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+  <% unless user_signed_in? %>
+    <div class="mb-4">
+      <label for="user_id" class="block text-gray-700 font-medium mb-1">Employee ID:</label>
+      <input type="text" name="user_id" id="user_id" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500">
     </div>
-    
+  <% else %>
+    <input type="hidden" name="user_id" id="user_id" value="<%= current_user.id %>">
+  <% end %>
+
     <% @survey.categories.each do |category| %>
-      <div class="category-section">
-        <h2><%= category.name %></h2>
-        <p><%= category.description %></p>
-        
+      <div class="border border-gray-200 rounded-xl p-4">
+        <h2 class="text-xl font-semibold text-gray-800 mb-1"><%= category.name %></h2>
+        <p class="text-gray-500 mb-4"><%= category.description %></p>
+
         <% category.questions.order(:position).each do |question| %>
-          <div class="question">
-            <p><%= question.text %></p>
-            
-            <div class="answers">
-              <% question.answers.each do |answer| %>
-                <div class="answer-option">
-                  <input 
-                    type="radio" 
-                    name="question_answer_object[][answer_id]" 
-                    value="<%= answer.id %>" 
-                    id="answer_<%= answer.id %>"
-                    data-score="<%= answer.score %>"
-                    data-question-id="<%= question.id %>"
-                    data-category-id="<%= category.id %>"
-                  >
-                  <label for="answer_<%= answer.id %>"><%= answer.text %></label>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+  <div class="mb-4">
+    <p class="text-gray-700 font-medium"><%= question.text %></p>
+
+    <div class="mt-2 space-y-1">
+      <% question.answers.each do |answer| %>
+        <label class="flex items-center space-x-2">
+          <input 
+            type="radio" 
+            name="question_answer_object[<%= question.id %>][answer_id]"
+            value="<%= answer.id %>" 
+            id="answer_<%= answer.id %>"
+            data-score="<%= answer.score %>"
+            data-question-id="<%= question.id %>"
+            data-category-id="<%= category.id %>"
+            class="text-indigo-600 focus:ring-indigo-500 border-gray-300"
+          >
+          <span class="text-gray-600"><%= answer.text %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+<% end %>
       </div>
     <% end %>
-    
-    <button type="submit" class="submit-btn">Submit Response</button>
+
+    <div>
+      <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+        Submit Response
+      </button>
+    </div>
   </form>
 </div>
 
+<!-- JavaScript for AJAX -->
 <script>
   document.getElementById('survey-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
+    const userId = document.getElementById('user_id').value;
     const formData = {
-      user_id: document.getElementById('user_id').value,
+      user_id: userId,
       question_answer_object: []
     };
-    
+
     // Get all selected answers
-    const selectedAnswers = document.querySelectorAll('input[name="question_answer_object[][answer_id]"]:checked');
-    
+    const selectedAnswers = document.querySelectorAll('input[type="radio"]:checked');
+
     selectedAnswers.forEach(function(answer) {
       formData.question_answer_object.push({
         question_id: answer.dataset.questionId,
@@ -64,8 +71,21 @@
         category_id: answer.dataset.categoryId
       });
     });
-    
-    // Submit via AJAX
+
+    // ✅ Count all unique question IDs in the form
+    const allQuestionIds = Array.from(document.querySelectorAll('input[type="radio"][data-question-id]'))
+      .map(el => el.dataset.questionId);
+    const totalQuestions = [...new Set(allQuestionIds)].length;
+
+    // ✅ Count unique answered questions
+    const answeredQuestions = [...new Set(formData.question_answer_object.map(ans => ans.question_id))].length;
+
+    if (answeredQuestions !== totalQuestions) {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+
+    // Submit the data
     fetch('<%= survey_responses_path(@survey) %>', {
       method: 'POST',
       headers: {
