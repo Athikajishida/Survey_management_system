@@ -1,4 +1,88 @@
-<div>
-  <h1 class="font-bold text-4xl">Admin::Dashboard#index</h1>
-  <p>Find me in app/views/admin/dashboard/index.html.erb</p>
+<div class="p-6">
+  <h1 class="text-4xl font-bold mb-4">Leadership Dashboard</h1>
+  <p class="text-gray-600 mb-8">Survey Performance Overview</p>
+
+  <!-- Average Score per Category -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <% KpiCalculator.average_score_per_category(@survey.id).each do |category| %>
+      <div class="bg-white shadow rounded-2xl p-4">
+        <h2 class="text-lg font-semibold mb-2"><%= category.name %></h2>
+        <p class="text-2xl font-bold text-blue-600"><%= category.avg_score %>%</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Engagement Index -->
+  <div class="bg-white shadow rounded-2xl p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Employee Engagement Index</h2>
+    <div class="overflow-auto max-h-64">
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="text-left p-2">User ID</th>
+            <th class="text-left p-2">Engagement Score (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% KpiCalculator.employee_engagement_index(@survey.id).each do |record| %>
+            <tr class="border-b">
+              <td class="p-2"><%= record.user_id %></td>
+              <td class="p-2"><%= record.engagement_score.round(2) %>%</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Performance Brackets -->
+  <div class="bg-white shadow rounded-2xl p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Performance Brackets</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% KpiCalculator.performance_brackets(@survey.id).each do |label, percentage| %>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <h3 class="text-sm font-medium text-gray-700"><%= label %></h3>
+          <p class="text-xl font-bold text-indigo-500"><%= percentage %>%</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Category Performance Comparison -->
+  <div class="bg-white shadow rounded-2xl p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Category Performance Comparison</h2>
+    <table class="w-full table-auto">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="text-left p-2">Category</th>
+          <th class="text-left p-2">Avg Score</th>
+          <th class="text-left p-2">Min Score</th>
+          <th class="text-left p-2">Max Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% KpiCalculator.category_performance_comparison(@survey.id).each do |name, stats| %>
+          <tr class="border-b">
+            <td class="p-2"><%= name %></td>
+            <td class="p-2"><%= stats[:avg_score] %>%</td>
+            <td class="p-2"><%= stats[:min_score] %>%</td>
+            <td class="p-2"><%= stats[:max_score] %>%</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Classification Thresholds -->
+  <div class="bg-white shadow rounded-2xl p-6">
+    <h2 class="text-2xl font-semibold mb-4">Dynamic Classification Thresholds</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% KpiCalculator.dynamic_classification_thresholds(@survey.id).each do |label, value| %>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <h3 class="text-sm font-medium text-gray-700"><%= label.to_s.humanize %></h3>
+          <p class="text-xl font-bold text-green-600"><%= value %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
