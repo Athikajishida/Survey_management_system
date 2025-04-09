@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+      <div class="p-4 text-indigo-700 font-bold text-xl border-b">Admin Panel</div>
+      <nav class="p-4 space-y-2 text-sm text-gray-700">
+        <%= link_to "Dashboard", admin_root_path, class: "block hover:text-indigo-600" %>
+        <%= link_to "Surveys", admin_surveys_path, class: "block hover:text-indigo-600" %>
+        <%= link_to "Categories", admin_categories_path, class: "block hover:text-indigo-600" %>
+        <%= link_to "Questions", admin_questions_path, class: "block hover:text-indigo-600" %>
+        <%= link_to "Tags", admin_tags_path, class: "block hover:text-indigo-600" %>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1">
+      <!-- Navbar -->
+      <header class="bg-white shadow flex justify-between items-center px-6 py-4">
+        <div>
+          <%= content_for?(:breadcrumbs) ? yield(:breadcrumbs) : "Admin Dashboard" %>
+        </div>
+        <div>
+          <%= link_to "Logout", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "text-sm text-gray-600 hover:text-red-600" %>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="p-6">
+        <%= yield %>
+      </main>
+    </div>
+  </div>
+
+</body>
+</html>

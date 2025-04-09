@@ -1,0 +1,31 @@
+<% content_for :title, "Tags" %>
+
+<div class="w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="font-bold text-4xl">Tags</h1>
+    <%= link_to "New tag", new_admin_tag_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+  </div>
+
+  <div id="admin_tags" class="min-w-full divide-y divide-gray-200 space-y-5">
+    <% if @admin_tags.any? %>
+      <% @admin_tags.each do |admin_tag| %>
+        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0 border-b border-gray-200">
+          <div class="w-full sm:w-auto mb-2 sm:mb-0">
+            <p class="text-lg font-semibold text-gray-800"><%= admin_tag.name %></p>
+          </div>
+          <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+            <%= link_to "Show", admin_tag_path(admin_tag), class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-center" %>
+            <%= link_to "Edit", edit_admin_tag_path(admin_tag), class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-center" %>
+            <%= button_to "Destroy", admin_tag_path(admin_tag), method: :delete, class: "rounded-md px-3.5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium text-center", data: { turbo_confirm: "Are you sure?" } %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-center my-10 text-gray-500">No tags found.</p>
+    <% end %>
+  </div>
+</div>

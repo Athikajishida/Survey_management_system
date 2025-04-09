@@ -27,4 +27,14 @@ Rails.application.routes.draw do
     resources :responses, only: [:create]
     get 'kpi_dashboard', to: 'kpis#dashboard'
   end
+
+  namespace :admin do
+    get "dashboard/index"
+    root to: 'dashboard#index'
+  
+    resources :surveys
+    resources :categories
+    resources :questions
+    resources :tags
+  end
 end
