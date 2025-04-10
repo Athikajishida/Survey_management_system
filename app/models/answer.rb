@@ -1,3 +1,9 @@
+# @file app/models/answer.rb
+# @description Represents an answer to a survey question with an associated score.
+# Used in scoring and classification of responses.
+# @version 1.0.0
+# @author
+#   - Athika Jishida
 class Answer < ApplicationRecord
   belongs_to :question
   has_many :response_details

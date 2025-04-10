@@ -1,5 +1,12 @@
+# @file spec/controllers/surveys_controller_spec.rb
+# @description Test suite for SurveysController.
+# Covers fetching active surveys and showing individual survey details,
+# including user participation checks.
+# @version 1.0.0
+# @requires Devise helpers for authentication and Response model for survey participation tracking.
+# @author
+#   - Athika Jishida
 require 'rails_helper'
-
 
 RSpec.describe SurveysController, type: :controller do
   describe 'GET #index' do

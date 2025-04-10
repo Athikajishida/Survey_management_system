@@ -1,3 +1,9 @@
+# @file app/models/question.rb
+# @description : Represents a question in a category, includes metadata like type and position.
+# A question can have multiple answers and be associated with tags.
+# @version 1.0.0
+# @author
+#   - Athika Jishida
 class Question < ApplicationRecord
   belongs_to :category
   has_many :answers, dependent: :destroy

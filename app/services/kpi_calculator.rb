@@ -1,4 +1,14 @@
+# @file app/services/kpi_calculator.rb
+# @description Service class to compute dynamic Key Performance Indicators (KPIs) based on survey responses.
+# Supports analysis such as average scores, engagement index, performance brackets, and personalized benchmarks.
+# @version 1.0.0
+# @author
+#   - Athika Jishida
+
 class KpiCalculator
+  # Calculates the average score (percentage) for each category in a given survey.
+  # @param survey_id [Integer] the ID of the survey.
+  # @return [ActiveRecord::Relation] list of category IDs, names, and their average scores.
   def self.average_score_per_category(survey_id)
     UserCategoryScore.joins(:category)
                      .where(survey_id: survey_id)
@@ -7,13 +17,20 @@ class KpiCalculator
                      .order('categories.name')
   end
   
+  # Computes the engagement index for each user by averaging their category scores.
+  # @param survey_id [Integer]
+  # @return [ActiveRecord::Relation] list of users and their average engagement scores.
   def self.employee_engagement_index(survey_id)
     UserCategoryScore.where(survey_id: survey_id)
                      .group(:user_id)
                      .select('user_id, AVG(percentage) as engagement_score')
                      .order(engagement_score: :desc)
   end
-  
+ 
+  # Calculates the percentage of users falling into each performance classification.
+  # Classifications: Poor, Average, Good, Very Proficient.
+  # @param survey_id [Integer]
+  # @return [Hash] classification names as keys with percentage values.
   def self.performance_brackets(survey_id)
     total_users = UserCategoryScore.where(survey_id: survey_id).select(:user_id).distinct.count
     return {} if total_users.zero?
@@ -32,7 +49,9 @@ class KpiCalculator
     # Convert to percentages
     brackets.transform_values { |count| (count.to_f / total_users * 100).round(2) }
   end
-  
+  # Compares average, min, and max category performance for the given survey.
+  # @param survey_id [Integer]
+  # @return [Hash] category names as keys with performance data.
   def self.category_performance_comparison(survey_id)
     categories = Category.where(survey_id: survey_id)
     
@@ -50,6 +69,10 @@ class KpiCalculator
     result
   end
   
+  # Generates dynamic classification thresholds based on quartiles of all user scores.
+  # Useful for evolving datasets.
+  # @param survey_id [Integer]
+  # @return [Hash] threshold cutoffs for each classification.
   def self.dynamic_classification_thresholds(survey_id)
     scores = UserCategoryScore.where(survey_id: survey_id).pluck(:percentage).compact
     return { poor: 0, average: 30, good: 60, very_proficient: 80 } if scores.empty?
@@ -68,6 +91,10 @@ class KpiCalculator
   end
 
 
+  # Fetches individual user’s category-wise scores and classifications for a survey.
+  # @param survey_id [Integer]
+  # @param user_id [Integer]
+  # @return [Array<Hash>] details per category (score, percentage, classification).
   def self.user_scores_for_survey(survey_id, user_id)
     scores = UserCategoryScore.includes(:category)
                               .where(survey_id: survey_id, user_id: user_id)
@@ -83,6 +110,10 @@ class KpiCalculator
     end
   end
 
+  # Calculates a user’s overall engagement score (average of all category percentages).
+  # @param survey_id [Integer]
+  # @param user_id [Integer]
+  # @return [Float] engagement percentage.
   def self.user_engagement_score(survey_id, user_id)
     scores = UserCategoryScore.where(survey_id: survey_id, user_id: user_id)
     return 0 if scores.empty?
@@ -90,7 +121,11 @@ class KpiCalculator
     scores.average(:percentage).round(2)
   end
 
-  # 🔥 NEW: Comparison of user's category scores vs overall average
+
+  # Compares a user’s category performance with the average across all users.
+  # @param survey_id [Integer]
+  # @param user_id [Integer]
+  # @return [Array<Hash>] category-wise comparison between user and average.
   def self.user_vs_average_scores(survey_id, user_id)
     user_scores = user_scores_for_survey(survey_id, user_id)
     overall_scores = average_score_per_category(survey_id)

@@ -1,3 +1,10 @@
+# @file spec/controllers/responses_controller_spec.rb
+# @description Test suite for ResponsesController, covering creation of survey responses.
+# Mocks the SurveyResponseProcessor service to isolate controller behavior and test response handling.
+# @version 1.0.0
+# @requires SurveyResponseProcessor service and JSON parsing for response validation.
+# @author
+#   - Athika Jishida
 require 'rails_helper'
 
 RSpec.describe ResponsesController, type: :controller do
@@ -13,7 +20,7 @@ RSpec.describe ResponsesController, type: :controller do
       position: 1
     )
     answer = Answer.create!(text: "Test Answer", question: question, score: 4)
-  
+ 
     {
       user_id: user.id,
       question_answer_object: [

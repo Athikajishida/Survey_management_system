@@ -1,4 +1,18 @@
+# @file app/controllers/kpis_controller.rb
+# @description Controller for computing and displaying KPI metrics for surveys.
+# Provides both admin dashboard and user-specific views.
+# @version 1.0.0
+# @author
+#   - Athika Jishida
 class KpisController < ApplicationController
+  # GET /kpis/dashboard?survey_id=:survey_id
+  #
+  # Displays survey-level KPIs:
+  # - Average score per category
+  # - Overall engagement index
+  # - Performance bracket distribution
+  # - Min/Max/Avg category comparison
+  # - Adaptive classification thresholds
   def dashboard
     @survey = Survey.find(params[:survey_id])
     @avg_scores = KpiCalculator.average_score_per_category(@survey.id)
@@ -18,7 +32,12 @@ class KpisController < ApplicationController
       } }
     end
   end
-
+  # GET /kpis/user_dashboard?survey_id=:survey_id
+  #
+  # Shows logged-in user's performance on a selected survey:
+  # - Individual engagement score
+  # - Category-wise scores and classifications
+  # - Comparison with overall averages
   def user_dashboard
     @user = current_user
     @surveys = Survey.all

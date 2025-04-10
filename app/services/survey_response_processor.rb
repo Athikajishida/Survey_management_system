@@ -1,6 +1,14 @@
+# @file app/services/survey_response_processor.rb
+# @description Handles the creation and processing of a user's survey response. 
+# Includes response recording, answer validation, and category-level scoring with classification.
+# @version 1.0.0
+# @author
+#   - Athika Jishida
 class SurveyResponseProcessor
   attr_reader :params, :user, :survey, :response
-  
+
+  # Initializes the processor with form data.
+  # Extracts user and determines survey via the first question's category.
   def initialize(params)
     @params = params
     @user = User.find_by(id: params["user_id"])
@@ -9,6 +17,14 @@ class SurveyResponseProcessor
     @survey = first_question&.category&.survey if first_question
   end
   
+  # Processes the full response within a database transaction.
+  # Steps:
+  # 1. Validate user & survey
+  # 2. Create a Response record
+  # 3. Store each question's answer
+  # 4. Calculate category scores
+  # 5. Mark response complete
+  # @return [Hash] success or error message
   def process
     return { success: false, errors: ["User not found"] } unless user
     return { success: false, errors: ["Survey not found"] } unless survey
@@ -25,11 +41,13 @@ class SurveyResponseProcessor
   end
   
   private
-  
+
+  # Creates the main response record.
   def create_response
     @response = Response.create!(user: user, survey: survey)
   end
-  
+
+  # Loops through each submitted answer and stores the score.
   def process_answers
     params["question_answer_object"].each do |answer_data|
       question = Question.find(answer_data["question_id"])
@@ -44,7 +62,8 @@ class SurveyResponseProcessor
       )
     end
   end
-  
+
+  # Aggregates scores per category and stores them in `user_category_scores`.
   def calculate_category_scores
     # Group questions by category
     category_questions = {}
