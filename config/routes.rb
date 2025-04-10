@@ -18,16 +18,19 @@ Rails.application.routes.draw do
   unauthenticated do
     root to: 'home#index', as: :unauthenticated_root
   end
+  resources :responses, only: [:create]
 
   root to: redirect('/')
 
   get 'dashboard', to: 'surveys#index'
-
-  resources :surveys, only: [:index, :show] do
+    resources :surveys, only: [:index, :show] do
     resources :responses, only: [:create]
   end
   resources :users, only: [] do
     get 'dashboard', to: 'kpis#user_dashboard', as: :dashboard
+  end
+  resources :surveys do
+    get 'dashboard', to: 'kpis#dashboard', as: :dashboard
   end
   namespace :admin do
     get "dashboard/index"

@@ -4,6 +4,7 @@ require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 require 'rspec/rails'
+require 'devise'
 
 begin
   ActiveRecord::Migration.maintain_test_schema!
@@ -21,5 +22,6 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
 
   config.filter_rails_from_backtrace!
-
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Devise::Test::IntegrationHelpers, type: :request
 end
