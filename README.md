@@ -1,4 +1,4 @@
-# 📝 Dynamic Survey Management System
+# 📝 Survey Management System
 
 A scalable and dynamic Ruby on Rails application for handling surveys, collecting responses, and analyzing KPIs for leadership insights.
 
