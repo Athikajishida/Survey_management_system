@@ -79,7 +79,7 @@ bundle install
 ```bash
 rails db:create
 rails db:migrate
-rails db:seed # optional if seeds provided
+rails db:seed 
 ```
 
 ### 4. Run the Server
