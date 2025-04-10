@@ -111,7 +111,7 @@ The system supports:
 * Automatic performance classification
 * Adaptability to any number of categories/questions
 
-## Bonus Ideas / Planned Features 🧠
+## Future Implementation 🧠
 
 * 📊 Visual dashboard using Chartkick or Recharts
 * 📅 Trend analysis over time
