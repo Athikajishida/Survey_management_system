@@ -59,14 +59,7 @@ git clone https://github.com/Athikajishida/survey_management_system.git
 cd survey_management_system
 # Survey Management System
 
-## Installation Guide
 
-### 1. Clone the Repository
-
-```bash
-git clone [repository-url]
-cd [repository-name]
-```
 
 ### 2. Install Dependencies
 
