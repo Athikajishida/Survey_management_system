@@ -57,9 +57,7 @@ A scalable and dynamic Ruby on Rails application for handling surveys, collectin
 ```bash
 git clone https://github.com/Athikajishida/survey_management_system.git
 cd survey_management_system
-# Survey Management System
-
-
+```
 
 ### 2. Install Dependencies
 
