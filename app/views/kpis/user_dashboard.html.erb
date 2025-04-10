@@ -1,0 +1,58 @@
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">My KPI Dashboard</h1>
+
+  <!-- Survey Selector -->
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">Select Survey</h2>
+    <%= form_with url: user_dashboard_path(@user), method: :get, local: true do %>
+      <div class="flex gap-2 items-center">
+        <%= select_tag :survey_id,
+              options_from_collection_for_select(@surveys, :id, :title, @selected_survey&.id),
+              prompt: "Choose a Survey",
+              class: "rounded border-gray-300 px-4 py-2" %>
+        <%= submit_tag "View", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Engagement Score -->
+  <div class="mb-10">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">Engagement Score</h2>
+    <div class="bg-white rounded-xl shadow p-4">
+      <% if @engagement_score %>
+        <p class="text-4xl font-bold text-indigo-600"><%= @engagement_score %>%</p>
+      <% else %>
+        <p class="text-gray-500">No data available.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- User vs Average Comparison -->
+  <div class="mb-10">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">My Scores vs Average</h2>
+    <% if @user_comparison.present? %>
+      <table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
+        <thead class="bg-gray-100 text-gray-600 uppercase text-sm">
+          <tr>
+            <th class="px-6 py-3 text-left">Category</th>
+            <th class="px-6 py-3 text-left">My Score</th>
+            <th class="px-6 py-3 text-left">Avg Score</th>
+            <th class="px-6 py-3 text-left">Classification</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @user_comparison.each do |row| %>
+            <tr>
+              <td class="px-6 py-4 font-medium"><%= row[:category] %></td>
+              <td class="px-6 py-4 text-indigo-600 font-bold"><%= row[:user_percentage] %>%</td>
+              <td class="px-6 py-4 text-gray-600"><%= row[:average_percentage] %>%</td>
+              <td class="px-6 py-4 text-sm text-gray-500"><%= row[:classification] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="text-gray-500">No comparison data available.</p>
+    <% end %>
+  </div>
+</div>

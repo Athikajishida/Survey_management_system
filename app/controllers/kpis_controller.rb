@@ -18,4 +18,29 @@ class KpisController < ApplicationController
       } }
     end
   end
+
+  def user_dashboard
+    @user = current_user
+    @surveys = Survey.all
+    @selected_survey = Survey.find_by(id: params[:survey_id]) || @surveys.first
+  
+    if @selected_survey
+      @engagement_score = KpiCalculator.user_engagement_score(@selected_survey.id, @user.id)
+      @user_scores = KpiCalculator.user_scores_for_survey(@selected_survey.id, @user.id)
+      @user_comparison = KpiCalculator.user_vs_average_scores(@selected_survey.id, @user.id)
+    else
+      @engagement_score = @user_scores = @user_comparison = []
+    end
+  
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: {
+          engagement_score: @engagement_score,
+          category_scores: @user_scores,
+          comparison: @user_comparison
+        }
+      }
+    end
+  end
 end

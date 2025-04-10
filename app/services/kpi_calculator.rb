@@ -66,4 +66,46 @@ class KpiCalculator
       very_proficient: quartile_3.round(2)
     }
   end
+
+
+  def self.user_scores_for_survey(survey_id, user_id)
+    scores = UserCategoryScore.includes(:category)
+                              .where(survey_id: survey_id, user_id: user_id)
+
+    scores.map do |score|
+      {
+        category: score.category.name,
+        total_score: score.total_score,
+        max_score: score.max_score,
+        percentage: score.percentage.round(2),
+        classification: score.classification
+      }
+    end
+  end
+
+  def self.user_engagement_score(survey_id, user_id)
+    scores = UserCategoryScore.where(survey_id: survey_id, user_id: user_id)
+    return 0 if scores.empty?
+
+    scores.average(:percentage).round(2)
+  end
+
+  # 🔥 NEW: Comparison of user's category scores vs overall average
+  def self.user_vs_average_scores(survey_id, user_id)
+    user_scores = user_scores_for_survey(survey_id, user_id)
+    overall_scores = average_score_per_category(survey_id)
+
+    comparison = user_scores.map do |user_score|
+      avg_score = overall_scores.find { |s| s.name == user_score[:category] }
+
+      {
+        category: user_score[:category],
+        user_percentage: user_score[:percentage],
+        average_percentage: avg_score&.avg_score&.round(2) || 0.0,
+        classification: user_score[:classification]
+      }
+    end
+
+    comparison
+  end
 end
